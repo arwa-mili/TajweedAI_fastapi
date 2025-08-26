@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+*.pyo
+*.pyd
+
+# Environment files
+*venv
+*.venv
+*.env
+*.env.*
+!*.example
+!*.prod
+
+
+# Fastapi migrations
+
+**/alembic/versions/

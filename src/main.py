@@ -1,20 +1,14 @@
 import os
-from typing import Union
 from fastapi import FastAPI
-from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
-from src.routers import  routes 
 from fastapi.middleware.cors import CORSMiddleware
-import os
+from .config import settings
+from .database import init_db
+from .routes import sessions
+from .web_socket import websocket_endpoint
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app = FastAPI(title="Real-time Audio Streaming Server")
 
-
-app = FastAPI()
-
-app.include_router(routes.router)
-
-
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -22,3 +16,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+os.makedirs(settings.AUDIO_STORAGE_DIR, exist_ok=True)
+
+init_db()
+
+app.include_router(sessions.router)
+
+# WebSocket route
+app.websocket("/ws/audio")(websocket_endpoint)

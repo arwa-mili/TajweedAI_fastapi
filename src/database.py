@@ -1,18 +1,24 @@
-
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+import sqlite3
+import os
 from .config import settings
-SQLALCHEMY_DATABASE_URL = f'postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}'
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=False)
-SessionLocal = sessionmaker(autoflush=False, autocommit=False, bind=engine)
-Base = declarative_base()
+def init_db():
+    conn = sqlite3.connect(settings.DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS audio_sessions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id TEXT NOT NULL,
+            chunk_sequence INTEGER NOT NULL,
+            file_path TEXT NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            duration_ms INTEGER,
+            file_size INTEGER,
+            actual_duration_ms REAL  
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+def get_connection():
+    return sqlite3.connect(settings.DB_PATH)

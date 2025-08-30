@@ -6,7 +6,7 @@ APP=src.main:app
 
 # FastAPI commands
 run:
-	fastapi dev main.py
+	fastapi dev main.py --host 0.0.0.0 --port 8000
 
 # Python package management
 install:

@@ -8,6 +8,12 @@ __pycache__/
 *.pyd
 *.vscode
 
+
+# db realted files
+*audio_chunks/
+*audio_sessions.db
+
+
 # Environment files
 *venv
 *.venv

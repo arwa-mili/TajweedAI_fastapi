@@ -8,7 +8,6 @@ from .web_socket import websocket_endpoint
 
 app = FastAPI(title="Real-time Audio Streaming Server")
 
-# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

@@ -1,6 +1,8 @@
 import json
 from datetime import datetime
 from fastapi import WebSocket, WebSocketDisconnect, Query
+
+from src.model_processing import transcribe
 from .audio_processor import AudioProcessor
 
 audio_processor = AudioProcessor()
@@ -86,6 +88,9 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(None)):
                     session_id, chunk_data, sequence, actual_duration_ms
                 )
                 
+                transcription = transcribe(file_path)  
+                
+
                 await websocket.send_text(json.dumps({
                     "type": "chunk_processed",
                     "session_id": session_id,
@@ -94,9 +99,9 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(None)):
                     "size": len(chunk_data),
                     "expected_duration_ms": 500,
                     "actual_duration_ms": actual_duration_ms,
-                    "timestamp": current_time.isoformat()
-                }))
-            
+                    "timestamp": current_time.isoformat(),
+                    "transcription": transcription[0]  
+                }))            
             elif message["type"] == "websocket.disconnect":
                 break
 

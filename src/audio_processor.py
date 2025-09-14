@@ -22,40 +22,44 @@ class AudioProcessor:
         sura_number = session_info.get("sura_number")
         ayat_begin = session_info.get("ayat_begin")
         ayat_end = session_info.get("ayat_end")
+        word_begin = session_info.get("word_begin")
+        word_end = session_info.get("word_end")
+
         
-        # Create filename with original audio format (assuming WAV or raw PCM)
+        # Create filename
         filename = f"{session_id}_{sequence}_{timestamp}.wav"
         file_path = os.path.join(settings.AUDIO_STORAGE_DIR, filename)
         
-        # Save the original audio data without conversion
-        async with aiofiles.open(file_path, 'wb') as f:
-            await f.write(chunk_data)
-        
-        # Calculate duration based on audio properties
+        # Wrap raw PCM bytes into proper WAV
         sample_rate = session_info.get("sample_rate", settings.SAMPLE_RATE)
         channels = session_info.get("channels", settings.CHANNELS)
-        
-        # Assuming 16-bit PCM audio (2 bytes per sample)
-        bytes_per_sample = 2
+        bytes_per_sample = 2  # assuming 16-bit PCM
+
         total_samples = len(chunk_data) // (channels * bytes_per_sample)
         calculated_duration_ms = (total_samples / sample_rate) * 1000
-        
         final_duration_ms = actual_duration_ms if actual_duration_ms is not None else calculated_duration_ms
+
+        # Write WAV file properly
+        with wave.open(file_path, 'wb') as wav_file:
+            wav_file.setnchannels(channels)
+            wav_file.setsampwidth(bytes_per_sample)
+            wav_file.setframerate(sample_rate)
+            wav_file.writeframes(chunk_data)
         
-        # Insert into database with Quran verse information
+        # Insert into database
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute('''
             INSERT INTO audio_sessions (
                 session_id, chunk_sequence, file_path, file_size, 
                 duration_ms, actual_duration_ms, sura_number, 
-                ayat_begin, ayat_end
+                ayat_begin, ayat_end, word_begin,word_end
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             session_id, sequence, file_path, len(chunk_data), 
             settings.CHUNK_DURATION_MS, final_duration_ms, 
-            sura_number, ayat_begin, ayat_end
+            sura_number, ayat_begin, ayat_end, word_begin, word_end
         ))
         conn.commit()
         conn.close()

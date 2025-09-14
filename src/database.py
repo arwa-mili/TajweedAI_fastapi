@@ -17,7 +17,9 @@ def init_db():
             actual_duration_ms REAL,
             sura_number INTEGER,
             ayat_begin INTEGER,
-            ayat_end INTEGER
+            ayat_end INTEGER,
+            word_begin INTEGER,
+            word_end INTEGER
         )
     ''')
     conn.commit()

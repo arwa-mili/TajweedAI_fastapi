@@ -31,6 +31,8 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(None)):
                         sura_number = data.get("sura_number")
                         ayat_begin = data.get("ayat_begin")
                         ayat_end = data.get("ayat_end")
+                        word_begin = data.get("word_begin")
+                        word_end = data.get("word_end")
 
                         audio_processor.sessions[session_id] = {
                             "sample_rate": sample_rate,
@@ -38,7 +40,9 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(None)):
                             "sequence": 0,
                             "sura_number": sura_number,
                             "ayat_begin": ayat_begin,
-                            "ayat_end": ayat_end
+                            "ayat_end": ayat_end,
+                            "word_begin": word_begin,
+                            "word_end" : word_end
                         }
 
                         audio_processor.session_timings[session_id] = {
@@ -55,6 +59,8 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(None)):
                             "sura_number": sura_number,
                             "ayat_begin": ayat_begin,
                             "ayat_end": ayat_end,
+                            "word_begin": word_begin,
+                            "word_end" : word_end,
                             "expected_chunk_duration_ms": 500
                         }))
                 except json.JSONDecodeError:

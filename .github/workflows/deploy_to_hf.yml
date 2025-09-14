@@ -1,0 +1,39 @@
+name: Deploy to Hugging Face Space
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Push to Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git remote add hf-space https://huggingface.co/spaces/Arwaaaa/tajweed-ai-fastapi
+          git add -A
+          git commit -m "Auto-deploy from GitHub Actions" || echo "No changes to commit"
+          git push https://Arwaaaa:${HF_TOKEN}@huggingface.co/spaces/Arwaaaa/tajweed-ai-fastapi main --force
+

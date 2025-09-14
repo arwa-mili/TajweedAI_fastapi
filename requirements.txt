@@ -6,7 +6,6 @@ anyio==4.10.0
 asttokens==3.0.0
 astunparse==1.6.3
 asyncio==4.0.0
-audioop-lts>=0.2.2; python_version >= "3.13"
 certifi==2025.8.3
 charset-normalizer==3.4.3
 click==8.2.1

@@ -26,11 +26,17 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(None)):
                         session_id = data.get("session_id", f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}")
                         sample_rate = data.get("sample_rate")
                         channels = data.get("channels")
+                        sura_number = data.get("sura_number")
+                        ayat_begin = data.get("ayat_begin")
+                        ayat_end = data.get("ayat_end")
 
                         audio_processor.sessions[session_id] = {
                             "sample_rate": sample_rate,
                             "channels": channels,
-                            "sequence": 0
+                            "sequence": 0,
+                            "sura_number": sura_number,
+                            "ayat_begin": ayat_begin,
+                            "ayat_end": ayat_end
                         }
 
                         audio_processor.session_timings[session_id] = {
@@ -44,6 +50,9 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(None)):
                             "session_id": session_id,
                             "sample_rate": sample_rate,
                             "channels": channels,
+                            "sura_number": sura_number,
+                            "ayat_begin": ayat_begin,
+                            "ayat_end": ayat_end,
                             "expected_chunk_duration_ms": 500
                         }))
                 except json.JSONDecodeError:
@@ -72,25 +81,21 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(None)):
                 audio_processor.session_timings[session_id]["last_chunk_time"] = current_time
                 sequence += 1
 
-                mp3_data = audio_processor.convert_to_mp3(chunk_data)
-                if mp3_data:
-                    file_path = await audio_processor.save_audio_chunk(session_id, mp3_data, sequence, actual_duration_ms)
-                    await websocket.send_text(json.dumps({
-                        "type": "chunk_processed",
-                        "session_id": session_id,
-                        "sequence": sequence,
-                        "file_path": file_path,
-                        "size": len(mp3_data),
-                        "original_size": len(chunk_data),
-                        "expected_duration_ms": 500,
-                        "actual_duration_ms": actual_duration_ms,
-                        "timestamp": current_time.isoformat()
-                    }))
-                else:
-                    await websocket.send_text(json.dumps({
-                        "type": "error",
-                        "message": f"Failed to convert chunk {sequence} to MP3"
-                    }))
+                # Save audio chunk without conversion
+                file_path = await audio_processor.save_audio_chunk(
+                    session_id, chunk_data, sequence, actual_duration_ms
+                )
+                
+                await websocket.send_text(json.dumps({
+                    "type": "chunk_processed",
+                    "session_id": session_id,
+                    "sequence": sequence,
+                    "file_path": file_path,
+                    "size": len(chunk_data),
+                    "expected_duration_ms": 500,
+                    "actual_duration_ms": actual_duration_ms,
+                    "timestamp": current_time.isoformat()
+                }))
             
             elif message["type"] == "websocket.disconnect":
                 break
@@ -100,3 +105,4 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(None)):
     finally:
         if session_id and session_id in audio_processor.session_timings:
             del audio_processor.session_timings[session_id]
+

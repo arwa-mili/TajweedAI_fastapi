@@ -16,6 +16,7 @@ class AudioProcessor:
     
     async def save_audio_chunk(self, session_id: str, chunk_data: bytes, sequence: int, actual_duration_ms: float = None) -> str:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        print(session_info)
         
         # Get session info for Quran verse details
         session_info = self.sessions.get(session_id, {})

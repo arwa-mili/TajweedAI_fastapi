@@ -9,18 +9,16 @@ from src.model import load_model
 # -----------------------------
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-# ✅ load model and processor once via your helper
 model, processor = load_model()
 model.to(device)
 
 def transcribe(audio_path: str) -> str:
     audio, sr = sf.read(audio_path)
 
-    # If stereo, convert to mono
+    
     if len(audio.shape) > 1:
         audio = audio.mean(axis=1)
 
-    # Ensure 16kHz sample rate
     if sr != 16000:
         audio = librosa.resample(audio, orig_sr=sr, target_sr=16000)
         sr = 16000

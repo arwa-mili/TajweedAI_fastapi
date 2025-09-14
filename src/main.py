@@ -8,8 +8,7 @@ from src.routes import sessions
 from src.web_socket import websocket_endpoint
 from src.model import load_model
 
-# Load model once at startup
-model, processor = load_model()
+
 
 app = FastAPI(title="Real-time Audio Streaming Server")
 

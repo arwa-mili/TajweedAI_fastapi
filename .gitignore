@@ -14,7 +14,7 @@ __pycache__/
 *audio_sessions.db
 
 #model
-*whisper-tiny-ar-quran-local/
+*/whisper-tiny-ar-quran-local/
 
 # Environment files
 *venv

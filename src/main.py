@@ -1,10 +1,10 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .config import settings
-from .database import init_db
-from .routes import sessions
-from .web_socket import websocket_endpoint
+from src.config import settings
+from src.database import init_db
+from src.routes import sessions
+from src.web_socket import websocket_endpoint
 
 app = FastAPI(title="Real-time Audio Streaming Server")
 

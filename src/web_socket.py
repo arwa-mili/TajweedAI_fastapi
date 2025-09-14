@@ -1,6 +1,8 @@
 import json
 from datetime import datetime
 from fastapi import WebSocket, WebSocketDisconnect, Query
+
+from src.model_processing import transcribe
 from .audio_processor import AudioProcessor
 
 audio_processor = AudioProcessor()
@@ -29,6 +31,8 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(None)):
                         sura_number = data.get("sura_number")
                         ayat_begin = data.get("ayat_begin")
                         ayat_end = data.get("ayat_end")
+                        word_begin = data.get("word_begin")
+                        word_end = data.get("word_end")
 
                         audio_processor.sessions[session_id] = {
                             "sample_rate": sample_rate,
@@ -36,7 +40,9 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(None)):
                             "sequence": 0,
                             "sura_number": sura_number,
                             "ayat_begin": ayat_begin,
-                            "ayat_end": ayat_end
+                            "ayat_end": ayat_end,
+                            "word_begin": word_begin,
+                            "word_end" : word_end
                         }
 
                         audio_processor.session_timings[session_id] = {
@@ -53,6 +59,8 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(None)):
                             "sura_number": sura_number,
                             "ayat_begin": ayat_begin,
                             "ayat_end": ayat_end,
+                            "word_begin": word_begin,
+                            "word_end" : word_end,
                             "expected_chunk_duration_ms": 500
                         }))
                 except json.JSONDecodeError:
@@ -86,6 +94,9 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(None)):
                     session_id, chunk_data, sequence, actual_duration_ms
                 )
                 
+                transcription = transcribe(file_path)  
+                
+
                 await websocket.send_text(json.dumps({
                     "type": "chunk_processed",
                     "session_id": session_id,
@@ -94,9 +105,9 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(None)):
                     "size": len(chunk_data),
                     "expected_duration_ms": 500,
                     "actual_duration_ms": actual_duration_ms,
-                    "timestamp": current_time.isoformat()
-                }))
-            
+                    "timestamp": current_time.isoformat(),
+                    "transcription": transcription[0]  
+                }))            
             elif message["type"] == "websocket.disconnect":
                 break
 

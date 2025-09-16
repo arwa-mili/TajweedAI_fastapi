@@ -1,22 +1,22 @@
 # Variables
 SHELL := /bin/bash
-PYTHON=python3
-PIP=pip
-APP=src.main:app  
+PYTHON := python3
+VENV := venv
+PIP := $(VENV)/bin/pip
+ACTIVATE := source $(VENV)/bin/activate
+APP := src.main:app  
 
-# FastAPI commands
 run:
-	source venv/bin/activate && fastapi dev src/main.py --host 0.0.0.0 --port 8000
+	$(ACTIVATE) && PYTHONPATH=.. uvicorn $(APP) --reload --host 0.0.0.0 --port 8000
 
-# Python package management
 install:
-	source venv/bin/activate && $(PIP) install -r requirements.txt
+	$(ACTIVATE) && $(PIP) install --pre --timeout 120 --retries 10 -r requirements.txt
 
 freeze:
-	source venv/bin/activate && $(PIP) freeze > requirements.txt
+	$(ACTIVATE) && $(PIP) freeze > requirements.txt
 
-# Init project
 init:
-	python3 -m venv venv
-	source venv/bin/activate
+	$(PYTHON) -m venv $(VENV)
+	$(ACTIVATE)
 	$(MAKE) install
+

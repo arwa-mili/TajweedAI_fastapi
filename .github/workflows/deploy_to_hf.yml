@@ -1,0 +1,49 @@
+name: Deploy FastAPI to Hugging Face Space
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.13"
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install --pre --timeout 120 --retries 10 -r requirements.txt || true
+
+      #- name: Run tests
+      #  run: |
+      #    source venv/bin/activate
+      #    pytest tests
+
+      - name: Deploy to Hugging Face
+        env:
+          HF_TOKEN: ${{ secrets.HUGGING_FACE_TAJWEED }}
+        run: |
+          source venv/bin/activate
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git remote add hf-space https://huggingface.co/spaces/Arwaaaa/tajweed-ai-fastapi || true
+          git add -A
+          git commit -m "Auto-deploy from GitHub Actions" || echo "No changes to commit"
+          git push https://Arwaaaa:${HF_TOKEN}@huggingface.co/spaces/Arwaaaa/tajweed-ai-fastapi master --force
+
+      - name: Deactivate venv
+        run: deactivate || true
+

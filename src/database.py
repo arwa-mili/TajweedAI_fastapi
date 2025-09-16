@@ -14,7 +14,12 @@ def init_db():
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
             duration_ms INTEGER,
             file_size INTEGER,
-            actual_duration_ms REAL  
+            actual_duration_ms REAL,
+            sura_number INTEGER,
+            ayat_begin INTEGER,
+            ayat_end INTEGER,
+            word_begin INTEGER,
+            word_end INTEGER
         )
     ''')
     conn.commit()

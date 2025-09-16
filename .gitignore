@@ -12,9 +12,11 @@ __pycache__/
 # db realted files
 *audio_chunks/
 *audio_sessions.db
+test_audio_files
 
 #model
 */whisper-tiny-ar-quran-local/
+whisper-tiny-ar-quran-local
 
 # Environment files
 *venv
@@ -23,5 +25,7 @@ __pycache__/
 *.env.*
 !*.example
 
+# test files
+test.html
 
 

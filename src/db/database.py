@@ -1,6 +1,5 @@
 import sqlite3
-import os
-from .config import settings
+from src.core.config import settings
 
 def init_db():
     conn = sqlite3.connect(settings.DB_PATH)

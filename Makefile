@@ -17,6 +17,7 @@ freeze:
 
 init:
 	$(PYTHON) -m venv $(VENV)
-	$(ACTIVATE)
+	. $(VENV)/bin/activate && $(PIP) install --upgrade pip
 	$(MAKE) install
+
 

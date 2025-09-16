@@ -1,11 +1,9 @@
 from fastapi import APIRouter
-from datetime import datetime
-from ..database import get_connection
-from ..config import settings
+from src.db.database import get_connection
 
 router = APIRouter()
 
-@router.get("/sessions")
+@router.get("")
 async def get_sessions():
     conn = get_connection()
     cursor = conn.cursor()
@@ -34,7 +32,7 @@ async def get_sessions():
         ]
     }
 
-@router.get("/sessions/{session_id}")
+@router.get("/{session_id}")
 async def get_session_details(session_id: str):
     conn = get_connection()
     cursor = conn.cursor()
@@ -63,14 +61,4 @@ async def get_session_details(session_id: str):
             }
             for row in chunks
         ]
-    }
-
-@router.get("/health")
-async def health_check():
-    return {
-        "status": "healthy",
-        "timestamp": datetime.now().isoformat(),
-        "storage_dir": settings.AUDIO_STORAGE_DIR,
-        "database": settings.DB_PATH,
-        "expected_chunk_duration_ms": settings.CHUNK_DURATION_MS
     }

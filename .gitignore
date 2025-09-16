@@ -25,5 +25,7 @@ whisper-tiny-ar-quran-local
 *.env.*
 !*.example
 
+# test files
+test.html
 
 

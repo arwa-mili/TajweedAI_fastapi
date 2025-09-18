@@ -19,14 +19,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Ensure audio directory exists
 os.makedirs(settings.AUDIO_STORAGE_DIR, exist_ok=True)
 
-# Init DB
 init_db()
 
-# Register routes
 app.include_router(sessions.router)
 
-# WebSocket route
 app.websocket("/ws/audio")(websocket_endpoint)
